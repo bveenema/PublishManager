@@ -3,14 +3,8 @@
 /* PublishManager library by Ben Veenema
  */
 
-// This will load the definition for common Particle variable types
 #include "Particle.h"
-
-// typedef struct pubEvent {
-//     String eventName;
-//     String data;
-//     struct pubEvent *next;
-// };
+#include <queue>
 
 // This is your main class that users will import into their application
 class PublishManager
@@ -20,7 +14,7 @@ public:
    * Constructor - Creates 1 second Software Timer to automagically publish
    *               without calling a "process" method
    */
-  PublishManager() : publishTimer(1000, &PublishQueue::PublishTimerCallback, *this, false) {
+  PublishManager() : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
       publishTimer.start();
   };
 
@@ -36,7 +30,6 @@ public:
        pubEvent newEvent = {.eventName=eventName, .data=data};
        pubQueue.push(newEvent);
      }
-
    };
 
   /**
@@ -53,6 +46,7 @@ private:
   std::queue<pubEvent> pubQueue;
   Timer publishTimer;
   bool FLAG_canPublish = true;
+
   /**
    * publishTimerCallback - Removes the front element from the queue and publishes
    *                        If there is no element in the queue, sets FLAG_canPublish
@@ -62,9 +56,9 @@ private:
          pubEvent frontEvent = pubQueue.front();
          pubQueue.pop();
          Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
-         bool FLAG_canPublish = false;
+         FLAG_canPublish = false;
        }else{
-         bool FLAG_canPublish = true;
+         FLAG_canPublish = true;
        }
    };
 };
