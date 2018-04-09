@@ -9,7 +9,7 @@ PublishManager publishManager;
 void setup() {
 
   // Cache some publish events before connecting to the cloud
-  for(int i = 0; i<8; i++){
+  for(int i = 0; i<4; i++){
     String data = "Test: " + i;
     publishManager.publish("Test", data);
   }
