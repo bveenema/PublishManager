@@ -1,6 +1,6 @@
 # PublishManager
 
-A Particle library for PublishManager
+A Particle library for managing your *Particle.publish()* events.  Makes sure you don't exceed the maximum publish rate of 1/second by caching *Particle.publish()* events and allows you to create publish events while you're offline utilizing the same cache!
 
 ## Welcome to your library!
 
