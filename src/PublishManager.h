@@ -6,7 +6,6 @@
 #include "Particle.h"
 #include <queue>
 
-// This is your main class that users will import into their application
 class PublishManager
 {
 public:
@@ -23,7 +22,7 @@ public:
    *            publish event (pubEvent) to the queue
    */
    void publish(String eventName, String data) {
-     if(FLAG_canPublish){
+     if(FLAG_canPublish && Particle.connected()){
        Particle.publish(eventName, data, 60, PRIVATE);
        FLAG_canPublish = false;
      } else {
@@ -52,7 +51,7 @@ private:
    *                        If there is no element in the queue, sets FLAG_canPublish
    */
    void publishTimerCallback() {
-       if (!pubQueue.empty()) {
+       if (!pubQueue.empty() && Particle.connected()) {
          pubEvent frontEvent = pubQueue.front();
          pubQueue.pop();
          Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
