@@ -13,7 +13,7 @@ void setup() {
 
   // Cache some publish events before connecting to the cloud
   for(int i = 0; i<6; i++){
-    String data = "Test: " + i;
+    String data = String("Test: ") + String(i);
     publishManager.publish("Test", data);
   }
 
@@ -26,7 +26,7 @@ void loop() {
   // Continue adding events to the queue at a slow enough pace for the publish
   // rate to catch up
   static int i;
-  String data = "Test in Loop: " + i;
+  String data = String("Test in Loop: ") + String(i);
 
   publishManager.publish("Test", data);
 

@@ -11,7 +11,7 @@ void setup() {
 
   // Add publish events faster than the Particle cloud can accept
   for(int i = 0; i<6; i++){
-    String data = "Test: " + i;
+    String data = String("Test: ") + String(i);
     publishManager.publish("Test", data);
   }
 }
@@ -22,7 +22,8 @@ void loop() {
   // rate to catch up
 
   static int i;
-  String data = "Test in Loop: " + i;
+  String data = String("Test in Loop: ") + String(i);
+  Serial.printlnf("Data in loop. data: %s", data.c_str());
 
   publishManager.publish("Test", data);
 

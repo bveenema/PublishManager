@@ -13,7 +13,7 @@ void setup() {
   // Add more publish events than the default cache size will allow
   //    publish events 11-20 (i=10 to i=19) will not be cached
   for(int i = 0; i<20; i++){
-    String data = "Test: " + i;
+    String data = String("Test: ") + String(i);
     publishManager.publish("Test", data);
   }
 
@@ -25,7 +25,7 @@ void setup() {
 
   // Add same number of publish events, but this time all of them will be published
   for(int i = 0; i<20; i++){
-    String data = "Test: " + i;
+    String data = String("Test: ") + String(i);
     publishManager.publish("Test", data);
   }
 }
@@ -36,7 +36,7 @@ void loop() {
   // rate to catch up
 
   static int i;
-  String data = "Test in Loop: " + i;
+  String data = String("Test in Loop: ") + String(i);
 
   publishManager.publish("Test", data);
 
