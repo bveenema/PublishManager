@@ -26,7 +26,7 @@ public:
    bool publish(String eventName, String data) {
      if(pubQueue.size() >= _maxCacheSize) return false;
 
-     if(FLAG_canPublish && Particle.connected()){
+     if(FLAG_canPublish && pubQueue.empty() && Particle.connected()){
        Particle.publish(eventName, data, 60, PRIVATE);
        FLAG_canPublish = false;
      } else {
