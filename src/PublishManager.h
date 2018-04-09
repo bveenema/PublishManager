@@ -25,11 +25,18 @@ public:
   };
 
   /**
-   * publish -  Adds a publish event (pubEvent) to the queue
+   * publish -  Publishes event immediately if timer has elapsed or adds a
+   *            publish event (pubEvent) to the queue
    */
    void publish(String eventName, String data) {
+     if(FLAG_canPublish){
+       Particle.publish(eventName, data, 60, PRIVATE);
+       FLAG_canPublish = false;
+     } else {
        pubEvent newEvent = {.eventName=eventName, .data=data};
        pubQueue.push(newEvent);
+     }
+
    };
 
   /**
@@ -45,16 +52,19 @@ private:
   };
   std::queue<pubEvent> pubQueue;
   Timer publishTimer;
-  bool FLAG_canPublish = false;
+  bool FLAG_canPublish = true;
   /**
    * publishTimerCallback - Removes the front element from the queue and publishes
-   *                       
+   *                        If there is no element in the queue, sets FLAG_canPublish
    */
    void publishTimerCallback() {
        if (!pubQueue.empty()) {
-           pubEvent frontEvent = pubQueue.front();
-           pubQueue.pop();
-           Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
+         pubEvent frontEvent = pubQueue.front();
+         pubQueue.pop();
+         Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
+         bool FLAG_canPublish = false;
+       }else{
+         bool FLAG_canPublish = true;
        }
    };
 };
