@@ -1,5 +1,8 @@
 // Example usage for PublishManager library by Ben Veenema.
 
+// Use case for PublishManager where publish events are created prior to the
+//  Particle cloud being available
+
 #include "PublishManager.h"
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
@@ -9,7 +12,7 @@ PublishManager publishManager;
 void setup() {
 
   // Cache some publish events before connecting to the cloud
-  for(int i = 0; i<4; i++){
+  for(int i = 0; i<6; i++){
     String data = "Test: " + i;
     publishManager.publish("Test", data);
   }
