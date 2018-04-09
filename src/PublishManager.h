@@ -20,8 +20,12 @@ public:
   /**
    * publish -  Publishes event immediately if timer has elapsed or adds a
    *            publish event (pubEvent) to the queue
+   *            Returns true if event is published or added to queue. Returns
+   *            false is the queue is full and event is discarded
    */
-   void publish(String eventName, String data) {
+   bool publish(String eventName, String data) {
+     if(pubQueue.size() >= _maxCacheSize) return false;
+
      if(FLAG_canPublish && Particle.connected()){
        Particle.publish(eventName, data, 60, PRIVATE);
        FLAG_canPublish = false;
@@ -29,7 +33,15 @@ public:
        pubEvent newEvent = {.eventName=eventName, .data=data};
        pubQueue.push(newEvent);
      }
+     return true;
    };
+
+  /**
+   * maxCacheSize - Sets the max cache size for pubQueue. Default 10
+   */
+  void maxCacheSize(uint8_t newMax) {
+    _maxCacheSize = newMax;
+  }
 
   /**
    * process -  RESERVED - may be used in future if library is to be used
@@ -45,6 +57,8 @@ private:
   std::queue<pubEvent> pubQueue;
   Timer publishTimer;
   bool FLAG_canPublish = true;
+
+  uint8_t _maxCacheSize = 10;
 
   /**
    * publishTimerCallback - Removes the front element from the queue and publishes
