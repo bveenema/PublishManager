@@ -4,6 +4,8 @@ A Particle library for managing your `Particle.publish()` events.  Makes sure yo
 
 PublishManager implements a First-In-First-Out (FIFO) queue so that `Particle.publish()'s` are published in the same order they are created and if you aren't generating publishes faster than 1/second, `publish events` will be sent at the same time they are created.
 
+[This library uses dynamic memory allocation](#a-word-of-caution)
+
 ## Usage
 
 Using PublishManager can be as simple as:
@@ -89,6 +91,17 @@ Class MyLibrary {
   private:
 };
 ```
+
+## A WORD OF CAUTION
+This library makes use of [std::queue][f3af6535]. This standard library is robust in it's implementation, but utilizes [Dynamic Memory Allocation][225d2811].  Over a long period of time or many allocations and de-allocations, this library may lead to [Heap Fragmentation][b831396c] which could in turn cause erratic behavior and/or cause the micro-controller to reset.
+
+It is unadvisable to use this library in a safety critical application without significant testing over long periods of time.
+
+This library is intended primarily to store `Particle.publish()` events while the devices is offline and then empty the cache when the cloud is available. It is also able to store publish events for rare cases where more than 1/second publishes (and more than 4 at a time) are required.  If your application regularly needs publishing at a high rate, it is advisable to look at other protocols such as TCP and UDP
+
+  [f3af6535]: http://en.cppreference.com/w/cpp/container/queue "cppreference.com - queue"
+  [225d2811]: https://en.wikipedia.org/wiki/C_dynamic_memory_allocation "Wikipedia - Dynamic Memory Allocation"
+  [b831396c]: https://stackoverflow.com/questions/3770457/what-is-memory-fragmentation "Stackoverflow - What is memory fragmentation"
 
 ## LICENSE
 Copyright 2018 Ben Veenema
