@@ -108,6 +108,11 @@ This library is intended primarily to store `Particle.publish()` events while th
   [225d2811]: https://en.wikipedia.org/wiki/C_dynamic_memory_allocation "Wikipedia - Dynamic Memory Allocation"
   [b831396c]: https://stackoverflow.com/questions/3770457/what-is-memory-fragmentation "Stackoverflow - What is memory fragmentation"
 
+## CHANGELOG
+
+v0.0.1 - Initial Release
+v0.0.2 - Add cacheSize()
+
 ## LICENSE
 Copyright 2018 Ben Veenema
 
