@@ -33,6 +33,12 @@ public:
        pubEvent newEvent = {.eventName=eventName, .data=data};
        pubQueue.push(newEvent);
      }
+
+     // start the timer if it isn't already running
+     if(!publishTimer.isActive()){
+       publishTimer.start();
+     }
+
      return true;
    };
 
@@ -79,8 +85,9 @@ private:
          pubQueue.pop();
          Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
          FLAG_canPublish = false;
-       }else{
+       }else if(pubQueue.empty()){
          FLAG_canPublish = true;
+         publishTimer.stop();
        }
    };
 };
