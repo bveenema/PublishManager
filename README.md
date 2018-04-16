@@ -23,7 +23,7 @@ void loop() {
 ```
 PublishManager creates it's own 1 second, Software Timer when it is initialized so you don't need to call a `.process()` or `.update()` method in your loop.
 
-Storing publish events can use up a lot of memory so PublishManager limits the number of events to **10**. You can ovverride this (with caution) using the `.maxCacheSize(int newMax)` method
+Storing publish events can use up a lot of memory so PublishManager limits the number of events to **10**. You can ovverride this (with caution) using the `.maxCacheSize(int newMax)` method. Absolute maximum cache size is 255.
 
 See the [examples](examples) folder for more details.
 
@@ -44,7 +44,12 @@ ___
 ```
 void maxCacheSize(uint8_t newMax)
 ```
-Sets the max cache size for the Publish Queue. Default 10
+Sets the max cache size for the Publish Queue. Default 10. Absolute maximum cache size is 255.
+___
+```
+int16_t cacheSize()
+```
+Returns the number of Particle.publish() events in the queue. 0 if empty. -1 if empty and enough time has passed for instant publish.
 ___
 
 ## Using PublishManager in multiple files

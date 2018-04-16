@@ -44,6 +44,15 @@ public:
   }
 
   /**
+   * cacheSize -  Returns the number of stored pubEvents in the queue.
+   *              Returns -1 if empty and FLAG_canPublish is true
+   */
+  int16_t cacheSize() {
+    if(pubQueue.size() == 0 && FLAG_canPublish) return -1;
+    return pubQueue.size();
+  }
+
+  /**
    * process -  RESERVED - may be used in future if library is to be used
    *            without software timer
    */
