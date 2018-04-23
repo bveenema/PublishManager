@@ -118,6 +118,7 @@ This library is intended primarily to store `Particle.publish()` events while th
 * v0.0.1 - Initial Release
 * v0.0.2 - Add cacheSize()
 * v0.0.3 - Additional method for using with Core's
+* v0.0.4 - Add example publishWithTimeStamp
 
 ## LICENSE
 Copyright 2018 Ben Veenema
