@@ -51,6 +51,11 @@ int16_t cacheSize()
 ```
 Returns the number of Particle.publish() events in the queue. 0 if empty. -1 if empty and enough time has passed for instant publish.
 ___
+```
+void process()
+```
+** ONLY USED ON CORE - UNTESTED ** - Call `process()` every loop (*and at least 1x/sec*) when using a Core.  When using this library with a Particle Core, there is no Software Timer available.  In this case, the publish rate is controlled with the system tick (`millis()`) and is updated via `process()`.  `process()` is a valid call on non-core platforms but will execute no code.
+___
 
 ## Using PublishManager in multiple files
 If your application requires PublishManager to be called from multiple files, like your own `.cpp` or `.c` files, create the `publishManager` object in your main `.ino` file and then use the `extern` keyword when "creating" the publishManager object in additional files.
@@ -110,8 +115,9 @@ This library is intended primarily to store `Particle.publish()` events while th
 
 ## CHANGELOG
 
-v0.0.1 - Initial Release
-v0.0.2 - Add cacheSize()
+* v0.0.1 - Initial Release
+* v0.0.2 - Add cacheSize()
+* v0.0.3 - Additional method for using with Core's
 
 ## LICENSE
 Copyright 2018 Ben Veenema

@@ -6,6 +6,14 @@
 #include "Particle.h"
 #include <queue>
 
+#if PLATFORM_ID == 0
+  #define IS_CORE TRUE
+#elif PLATFORM_ID == 2
+  #define IS_CORE TRUE
+#else
+  #define IS_CORE FALSE
+#endif
+
 class PublishManager
 {
 public:
@@ -13,9 +21,13 @@ public:
    * Constructor - Creates 1 second Software Timer to automagically publish
    *               without calling a "process" method
    */
-  PublishManager() : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
-      publishTimer.start();
-  };
+  #if IS_CORE == FALSE
+    PublishManager() : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
+        publishTimer.start();
+    };
+  #else
+    PublishManager(){}
+  #endif
 
   /**
    * publish -  Publishes event immediately if timer has elapsed or adds a
@@ -35,9 +47,11 @@ public:
      }
 
      // start the timer if it isn't already running
-     if(!publishTimer.isActive()){
-       publishTimer.start();
-     }
+     #if IS_CORE == FALSE
+       if(!publishTimer.isActive()){
+         publishTimer.start();
+       }
+     #endif
 
      return true;
    };
@@ -62,7 +76,14 @@ public:
    * process -  RESERVED - may be used in future if library is to be used
    *            without software timer
    */
-  void process();
+  void process(){
+    #if IS_CORE == TRUE
+      if(millis() - previousPubCallback > 1000){
+        previousPubCallback = millis();
+        this->publishTimerCallback();
+      }
+    #endif
+  }
 
 private:
   struct pubEvent {
@@ -70,8 +91,14 @@ private:
       String data;
   };
   std::queue<pubEvent> pubQueue;
-  Timer publishTimer;
+  #if IS_CORE == FALSE
+    Timer publishTimer;
+  #endif
   bool FLAG_canPublish = true;
+
+  #if IS_CORE == TRUE
+    uint32_t previousPubCallback = 0;
+  #endif
 
   uint8_t _maxCacheSize = 10;
 
@@ -87,7 +114,9 @@ private:
          FLAG_canPublish = false;
        }else if(pubQueue.empty()){
          FLAG_canPublish = true;
-         publishTimer.stop();
+         #if IS_CORE == FALSE
+           publishTimer.stop();
+         #endif
        }
    };
 };
