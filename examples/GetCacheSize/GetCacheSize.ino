@@ -9,7 +9,9 @@ PublishManager publishManager;
 
 void setup() {
   Serial.begin(9600);
-  delay(5000);
+  while(!Serial.isConnected()){
+    Particle.process();
+  }
 
   // publishManager initializes the cache empty and instant publish as ready
   int cacheSize = publishManager.cacheSize();
@@ -22,12 +24,14 @@ void setup() {
   }
 
   // publishManager slowly publishes the cache
-  Serial.printf("Cache Size: %i..", cacheSize); // Prints "4.."
-  while(publishManager.cacheSize() > 0){
+  Serial.printf("Cache Size: %i..", publishManager.cacheSize()); // Prints "4.."
+  delay(1000); // delay is only necessary in example to wait for the even to publish to the cloud
+  while(publishManager.cacheSize() > -1){
     int cacheSize = publishManager.cacheSize();
-    Serial.printf("%i..", cacheSize); // Prints "3.. 2.. 1.. 0.. -1"
+    Serial.printf("%i..", cacheSize); // Prints "3.. 2.. 1.. 0.."
     delay(1000);
   }
+  Serial.printf("%i", publishManager.cacheSize()); // Prints "-1"
 
 }
 
