@@ -27,6 +27,23 @@ Storing publish events can use up a lot of memory so PublishManager limits the n
 
 See the [examples](examples) folder for more details.
 
+## Adding a Timestamp
+When caching publish events for large durations of time, it can be useful to tag the event with a time stamp so the server can determine when the event occurred instead of when it was published.
+
+In order for this library to remain agnostic to data formatting, no method has been included to automatically add a time stamp, but a simple `sprintf()` statement can easily add a time stamp to the cache:
+```
+// Publishs "data" as a JSON char string called buffer, which contains the
+//  original data and a timestamp.
+//  ex: {"data": "test: 0", "time": 1524500000}
+void publishWithTimeStamp(String eventName, String data){
+  char buffer[255];
+
+  sprintf(buffer, "{\"data\": \"%s\", \"time\": %u}",data.c_str(), Time.now());
+
+  publishManager.publish(eventName, buffer);
+}
+```
+
 ## Documentation
 
 ```

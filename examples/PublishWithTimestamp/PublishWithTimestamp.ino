@@ -4,7 +4,6 @@
 //  created is stored in the cache
 
 #include "PublishManager.h"
-#include <ArduinoJson.h>
 
 PublishManager publishManager;
 
@@ -40,19 +39,13 @@ void loop() {
 }
 
 
-// Publishs "data" as a JSON char string called buffer, which contains the
+// Publishes "data" as a JSON char string called buffer, which contains the
 //  original data and a timestamp.
 //  ex: {"data": "test: 0", "time": 1524500000}
 void publishWithTimeStamp(String eventName, String data){
-  const size_t bufferSize = JSON_OBJECT_SIZE(2)+80;
-  DynamicJsonBuffer jsonBuffer(bufferSize);
+  char buffer[255];
 
-  JsonObject& root = jsonBuffer.createObject();
-  root["data"] = data.c_str();
-  root["time"] = Time.now();
-
-  char buffer[bufferSize];
-  root.printTo(buffer);
+  sprintf(buffer, "{\"data\": \"%s\", \"time\": %u}",data.c_str(), Time.now());
 
   publishManager.publish(eventName, buffer);
 }
