@@ -10,8 +10,10 @@ PublishManager publishManager;
 
 void setup() {
 
-  // Add more publish events than the default cache size will allow
-  //    publish events 11-20 (i=10 to i=19) will not be cached
+  // Add more publish events than the default cache size will allow.
+  //    publish events 12-20 (i=11 to i=19) will not be cached
+  //    the first publish event (i=0) does not count towards the cache because
+  //    it is published immediately
   for(int i = 0; i<20; i++){
     String data = String("Test: ") + String(i);
     publishManager.publish("Test", data);
