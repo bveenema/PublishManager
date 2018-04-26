@@ -5,14 +5,14 @@
 
 #include "PublishManager.h"
 
-PublishManager publishManager;
+PublishManager<> publishManager;
 
 void setup() {
 
   // Add publish events faster than the Particle cloud can accept
   for(int i = 0; i<6; i++){
     String data = String("Test: ") + String(i);
-    publishManager.publish("Test", data);
+    publishManager.publish("Test", data.c_str());
   }
 }
 

@@ -14,6 +14,8 @@
   #define IS_CORE FALSE
 #endif
 
+template <size_t _maxEventName = 63, size_t _maxData = 255, uint8_t _maxCacheSize = 5>
+
 class PublishManager
 {
 public:
@@ -22,8 +24,8 @@ public:
    *               without calling a "process" method
    */
   #if IS_CORE == FALSE
-    PublishManager() : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
-        publishTimer.start();
+    PublishManager(const uint8_t maxCache = 5) : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
+      publishTimer.start();
     };
   #else
     PublishManager(){}
@@ -35,14 +37,16 @@ public:
    *            Returns true if event is published or added to queue. Returns
    *            false is the queue is full and event is discarded
    */
-   bool publish(String eventName, String data) {
+   bool publish(const char* eventName, const char* data) {
      if(pubQueue.size() >= _maxCacheSize) return false;
 
      if(FLAG_canPublish && pubQueue.empty() && Particle.connected()){
        Particle.publish(eventName, data, 60, PRIVATE);
        FLAG_canPublish = false;
      } else {
-       pubEvent newEvent = {.eventName=eventName, .data=data};
+       pubEvent newEvent;
+       strcpy(newEvent.eventName,eventName);
+       strcpy(newEvent.data,data);
        pubQueue.push(newEvent);
      }
 
@@ -86,11 +90,7 @@ public:
   }
 
 private:
-  struct pubEvent {
-      String eventName;
-      String data;
-  };
-  std::queue<pubEvent> pubQueue;
+
   #if IS_CORE == FALSE
     Timer publishTimer;
   #endif
@@ -101,6 +101,22 @@ private:
   #endif
 
   uint8_t _maxCacheSize = 10;
+
+  struct pubEvent {
+      char eventName[_maxEventName];
+      char data[_maxData];
+  };
+
+  pubEvent pubQueue[_maxCacheSize];
+  int8_t headIndex = 0;
+  int8_t tailIndex = 0;
+
+  //https://embeddedartistry.com/blog/2017/4/6/circular-buffers-in-cc
+
+
+
+
+  std::queue<pubEvent> pubQueue;
 
   /**
    * publishTimerCallback - Removes the front element from the queue and publishes
