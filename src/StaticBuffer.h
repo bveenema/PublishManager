@@ -59,7 +59,9 @@ public:
     }
 
     size_t size(void){
-      return size_ - 1;
+
+      return head_ - tail_;
+      //return head_ > tail_ ? (size_ - head_ + tail_) : (tail_ - head_);
     }
 
 private:
