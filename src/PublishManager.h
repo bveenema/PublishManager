@@ -4,17 +4,9 @@
  */
 
 #include "Particle.h"
-#include <queue>
+#include "StaticBuffer.h"
 
-#if PLATFORM_ID == 0
-  #define IS_CORE TRUE
-#elif PLATFORM_ID == 2
-  #define IS_CORE TRUE
-#else
-  #define IS_CORE FALSE
-#endif
-
-template <size_t _maxEventName = 63, size_t _maxData = 255, uint8_t _maxCacheSize = 5>
+template <size_t _maxCacheSize = 5, size_t _maxEventName = 63, size_t _maxData = 255>
 
 class PublishManager
 {
@@ -23,13 +15,7 @@ public:
    * Constructor - Creates 1 second Software Timer to automagically publish
    *               without calling a "process" method
    */
-  #if IS_CORE == FALSE
-    PublishManager(const uint8_t maxCache = 5) : publishTimer(1000, &PublishManager::publishTimerCallback, *this, false) {
-      publishTimer.start();
-    };
-  #else
-    PublishManager(){}
-  #endif
+    PublishManager() : pubQueue(_maxCacheSize) {};
 
   /**
    * publish -  Publishes event immediately if timer has elapsed or adds a
@@ -38,7 +24,7 @@ public:
    *            false is the queue is full and event is discarded
    */
    bool publish(const char* eventName, const char* data) {
-     if(pubQueue.size() >= _maxCacheSize) return false;
+     if(pubQueue.full()) return false;
 
      if(FLAG_canPublish && pubQueue.empty() && Particle.connected()){
        Particle.publish(eventName, data, 60, PRIVATE);
@@ -47,25 +33,11 @@ public:
        pubEvent newEvent;
        strcpy(newEvent.eventName,eventName);
        strcpy(newEvent.data,data);
-       pubQueue.push(newEvent);
+       pubQueue.put(newEvent);
      }
-
-     // start the timer if it isn't already running
-     #if IS_CORE == FALSE
-       if(!publishTimer.isActive()){
-         publishTimer.start();
-       }
-     #endif
 
      return true;
    };
-
-  /**
-   * maxCacheSize - Sets the max cache size for pubQueue. Default 10
-   */
-  void maxCacheSize(uint8_t newMax) {
-    _maxCacheSize = newMax;
-  }
 
   /**
    * cacheSize -  Returns the number of stored pubEvents in the queue.
@@ -81,42 +53,24 @@ public:
    *            without software timer
    */
   void process(){
-    #if IS_CORE == TRUE
       if(millis() - previousPubCallback > 1000){
         previousPubCallback = millis();
         this->publishTimerCallback();
       }
-    #endif
   }
 
 private:
-
-  #if IS_CORE == FALSE
-    Timer publishTimer;
-  #endif
-  bool FLAG_canPublish = true;
-
-  #if IS_CORE == TRUE
-    uint32_t previousPubCallback = 0;
-  #endif
-
-  uint8_t _maxCacheSize = 10;
 
   struct pubEvent {
       char eventName[_maxEventName];
       char data[_maxData];
   };
 
-  pubEvent pubQueue[_maxCacheSize];
-  int8_t headIndex = 0;
-  int8_t tailIndex = 0;
+  StaticBuffer<pubEvent> pubQueue;
 
-  //https://embeddedartistry.com/blog/2017/4/6/circular-buffers-in-cc
+  bool FLAG_canPublish = true;
 
-
-
-
-  std::queue<pubEvent> pubQueue;
+  uint32_t previousPubCallback = 0;
 
   /**
    * publishTimerCallback - Removes the front element from the queue and publishes
@@ -124,15 +78,11 @@ private:
    */
    void publishTimerCallback() {
        if (!pubQueue.empty() && Particle.connected()) {
-         pubEvent frontEvent = pubQueue.front();
-         pubQueue.pop();
+         pubEvent frontEvent = pubQueue.get();
          Particle.publish(frontEvent.eventName, frontEvent.data, 60, PRIVATE);
          FLAG_canPublish = false;
        }else if(pubQueue.empty()){
          FLAG_canPublish = true;
-         #if IS_CORE == FALSE
-           publishTimer.stop();
-         #endif
        }
    };
 };
