@@ -5,7 +5,7 @@
 
 #include "PublishManager.h"
 
-PublishManager publishManager;
+PublishManager<10> publishManager;
 
 void setup() {
 
