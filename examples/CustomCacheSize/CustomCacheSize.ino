@@ -1,7 +1,7 @@
 // Example usage for PublishManager library by Ben Veenema.
 
-// How to use .cacheSize() to return the current size of the Particle.publsish()
-//      cache.
+// How to customize/optimize the cache to allow conserve memory or increase the
+//    cache size
 
 #include "PublishManager.h"
 
