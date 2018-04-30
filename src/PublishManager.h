@@ -22,6 +22,8 @@ public:
    *            publish event (pubEvent) to the queue
    *            Returns true if event is published or added to queue. Returns
    *            false is the queue is full and event is discarded
+   *            Also returns false if data or eventName are too long unless the
+   *            buffer is empty and the event can be published immediately.
    */
    bool publish(const char* eventName, const char* data) {
      if(pubQueue.full()) return false;
@@ -30,6 +32,8 @@ public:
        Particle.publish(eventName, data, 60, PRIVATE);
        FLAG_canPublish = false;
      } else {
+       if(strlen(data) > _maxData) return false;
+       if(strlen(eventName) > _maxEventName) return false;
        pubEvent newEvent;
        strcpy(newEvent.eventName,eventName);
        strcpy(newEvent.data,data);
