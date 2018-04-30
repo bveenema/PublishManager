@@ -11,7 +11,7 @@
 //
 //  FORMAT: <size_t maxCacheSize, size_t maxEventName, size_t maxData>
 //  Notes:  1.  Memory used is ~equal to (maxEventName + maxData) * maxCacheSize
-//          2.  Default chache uses 1590 bytes of (heap) memory
+//          2.  Default cache uses 1590 bytes of (heap) memory -> 5,63,255
 //          3.  Memory is allocated statically
 //
 PublishManager<10,20,50> publishManager; // 10 events in cache, max eventName = 20, max data length = 50 (~700 bytes)
@@ -22,6 +22,8 @@ void setup() {
   while(!Serial.isConnected()){
     Particle.process();
   }
+
+  delay(5000);
 
   // publishManager initializes the cache empty and instant publish as ready
   int cacheSize = publishManager.cacheSize();
@@ -60,6 +62,16 @@ void setup() {
   // Publish Event with eventName > maxEventName and data > maxData
   // Compilation will fail if the following line is uncommented
   // publishManager.process("This is way too long of an event name", "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ae");
+
+  // Publish Event with data > maxData generated after compile
+  pinMode(A0, INPUT);
+  int myRawData = analogRead(A0);
+  float myInterpretedData = 867.5309 + myRawData;
+  String myDataOutput = String("Bacon ipsum dolor amet frankfurter tenderloin,") + String(myInterpretedData);
+  if(publishManager.publish("Test data too long", myDataOutput) == false){
+    Serial.printlnf("REJECTED %s: ",myDataOutput.c_str());
+  }
+
 }
 
 void loop() {

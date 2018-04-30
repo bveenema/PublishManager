@@ -5,7 +5,8 @@
 
 #include "PublishManager.h"
 
-PublishManager<10> publishManager;
+// Optimize cache for more events and less data.  See CustomCacheSize example
+PublishManager<20,20,50> publishManager;
 
 void setup() {
 
@@ -25,17 +26,20 @@ void setup() {
 
 void loop() {
 
+  publishManager.process();
+
   // Continue adding events to the queue at a slow enough pace for the publish
   // rate to catch up
+  static uint32_t prevPubEventAdd;
+  if(millis() - prevPubEventAdd > 2000){
+    prevPubEventAdd = millis();
+    static int i;
+    String data = String("Testing this in Loop: ") + String(i);
+    Serial.printlnf("Data in loop. data: %s", data.c_str());
 
-  static int i;
-  String data = String("Test in Loop: ") + String(i);
-  Serial.printlnf("Data in loop. data: %s", data.c_str());
-
-  publishWithTimeStamp("Test", data);
-
-  delay(2000);
-  i++;
+    publishWithTimeStamp("Test", data);
+    i++;
+  }
 }
 
 
